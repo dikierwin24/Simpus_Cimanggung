@@ -1,0 +1,73 @@
+export const PKM_INFO = {
+  name: "UPTD Puskesmas Cimanggung",
+  dinas: "Dinas Kesehatan Kabupaten Sumedang",
+  tagline: "Melayani Dengan Hati dan Senyuman untuk Masyarakat Cimanggung yang Sehat & Mandiri",
+  address: "Jl. Raya Parakanmuncang - Simpang No. 209, Desa Sindangpakuon, Kec. Cimanggung, Kab. Sumedang, Jawa Barat 45364",
+  phone: "(022) 7792-341",
+  emergencyPhone: "0812-9587-4439",
+  whatsapp: "6281295874439", // format internasional untuk wa.me
+  whatsappDisplay: "0812-9587-4439",
+  email: "puskesmascimanggung@gmail.com",
+  headOfClinic: "dr. Cepy Tricahyadi",
+  nipHead: "19720514 200212 2 003",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Puskesmas+Cimanggung+Sumedang",
+  mapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15842.27783859751!2d107.8286915!3d-6.9420067!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c4a92c3f8e5f%3A0x6b10702f3ec05510!2sPuskesmas%20Cimanggung!5e0!3m2!1sid!2sid!4v1710000000000!5m2!1sid!2sid",
+  workingAreas: [
+    "Desa Bunter",
+    "Desa Cihanjuang",
+    "Desa Cikahuripan",
+    "Desa Cimanggung",
+    "Desa Mangunarga",
+    "Desa Pasirnanjung",
+    "Desa Sindanggalih",
+    "Desa Sindangpakuon",
+    "Desa Sindangsari",
+    "Desa Sukadana",
+    "Desa Tegalmanggung",
+    "Desa Sindulang"
+  ],
+  services: [
+    {
+      name: "Poli Umum",
+      desc: "Pemeriksaan kesehatan menyeluruh, konsultasi penyakit umum, resep obat, dan surat rujukan FKTP.",
+      icon: "Stethoscope",
+      color: "from-emerald-500 to-teal-600",
+    },
+    {
+      name: "Poli Gigi & Mulut",
+      desc: "Perawatan gigi, penambalan berlubang, pencabutan gigi, serta pembersihan karang gigi (scaling).",
+      icon: "Smile",
+      color: "from-teal-500 to-emerald-600",
+    },
+    {
+      name: "Poli KIA / KB & USG",
+      desc: "Pemeriksaan kehamilan (ANC), USG dasar, KB mantap, serta pemantauan pasca melahirkan (PNC).",
+      icon: "Baby",
+      color: "from-pink-500 to-rose-600",
+    },
+    {
+      name: "Poli MTBS & Imunisasi Anak",
+      desc: "Manajemen Terpadu Balita Sakit, imunisasi rutin lengkap, pencegahan stunting & tumbuh kembang.",
+      icon: "ShieldCheck",
+      color: "from-amber-500 to-orange-600",
+    },
+    {
+      name: "Laboratorium Patologi",
+      desc: "Pemeriksaan darah lengkap, kolesterol, gula darah puasa/sewaktu, asam urat, urine, & tes dahak TB.",
+      icon: "FlaskConical",
+      color: "from-emerald-600 to-teal-700",
+    },
+    {
+      name: "UGD & PONED 24 Jam",
+      desc: "Unit Gawat Darurat dan Ruang Bersalin Siaga 24 Jam dengan dokter jaga & ambulans emergency.",
+      icon: "HeartPulse",
+      color: "from-red-500 to-rose-700",
+    },
+    {
+      name: "Cek Kesehatan Gratis (CKG)",
+      desc: "Program skrining gratis berkala: tekanan darah, gula darah, dan lingkar perut usia 15 tahun ke atas.",
+      icon: "Activity",
+      color: "from-emerald-500 to-green-600",
+    },
+  ],
+};

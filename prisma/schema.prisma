@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("ADMIN") // ADMIN, STAFF, DOKTER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Poli {
+  id          String        @id @default(cuid())
+  name        String
+  code        String        @unique // e.g. UMM, GIG, KIA, LAB, UGD, ANK, GZI
+  description String
+  icon        String        @default("Stethoscope")
+  quotaPerDay Int           @default(50)
+  roomNumber  String        @default("R.01")
+  isActive    Boolean       @default(true)
+  doctors     Doctor[]
+  schedules   Schedule[]
+  queues      QueueTicket[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Doctor {
+  id             String     @id @default(cuid())
+  name           String     // e.g. dr. H. Aep Saepudin, Sp.PK
+  nip            String?    // Nomor Induk Pegawai
+  sip            String?    // Surat Izin Praktik
+  specialization String     // e.g. Dokter Umum, Dokter Gigi, Bidan Koordinator
+  poliId         String
+  poli           Poli       @relation(fields: [poliId], references: [id], onDelete: Cascade)
+  photoUrl       String?
+  phone          String?
+  isActive       Boolean    @default(true)
+  schedules      Schedule[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Schedule {
+  id        String   @id @default(cuid())
+  doctorId  String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  poliId    String
+  poli      Poli     @relation(fields: [poliId], references: [id], onDelete: Cascade)
+  dayOfWeek Int      // 1: Senin, 2: Selasa, 3: Rabu, 4: Kamis, 5: Jumat, 6: Sabtu, 7: Minggu
+  dayName   String   // "Senin", "Selasa", dll
+  startTime String   // "08:00"
+  endTime   String   // "12:00"
+  status    String   @default("HADIR") // HADIR, CUTI, TUGAS_LUAR, DIGANTIKAN
+  notes     String?  // Misal: "Pemeriksaan USG dasar" atau "Pengganti: dr. Siti"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QueueTicket {
+  id              String    @id @default(cuid())
+  ticketNumber    String    // e.g. UMM-001, GIG-012
+  nik             String    // 16 digit NIK
+  patientName     String
+  birthDate       String?
+  gender          String    @default("L") // L atau P
+  phone           String    // WhatsApp number
+  address         String?
+  poliId          String
+  poli            Poli      @relation(fields: [poliId], references: [id], onDelete: Cascade)
+  appointmentDate String    // YYYY-MM-DD
+  patientType     String    @default("BPJS") // BPJS atau UMUM
+  bpjsNumber      String?
+  complaint       String?   // Keluhan singkat pasien
+  status          String    @default("MENUNGGU") // MENUNGGU, DIPANGGIL, SELESAI, BATAL
+  calledAt        DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([appointmentDate, poliId])
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  content     String
+  category    String   @default("UMUM") // VAKSINASI, POSYANDU, JADWAL, DARURAT, EDUKASI, CKG
+  isPinned    Boolean  @default(false)
+  imageUrl    String?
+  author      String   @default("Tim Promkes Puskesmas Cimanggung")
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OperationalHour {
+  id           String  @id @default(cuid())
+  dayOfWeek    Int     @unique // 1..7 (1=Senin, 7=Minggu)
+  dayName      String  // "Senin", "Selasa", dll
+  loketOpen    String  // "07:30"
+  loketClose   String  // "11:30"
+  serviceOpen  String  // "08:00"
+  serviceClose String  // "14:00"
+  isClosed     Boolean @default(false)
+  isUgd24H     Boolean @default(true)
+  notes        String?
+}
+
+model SiteSetting {
+  id              String  @id @default("default")
+  name            String  @default("Puskesmas Cimanggung")
+  tagline         String  @default("Melayani Dengan Hati dan Senyuman untuk Masyarakat Cimanggung yang Sehat & Mandiri")
+  address         String  @default("Jl. Raya Parakanmuncang - Simpang No. 12, Sindanggalih, Kec. Cimanggung, Kab. Sumedang, Jawa Barat 45364")
+  phone           String  @default("(022) 7792-341")
+  emergencyPhone  String  @default("0812-2345-6789")
+  whatsapp        String  @default("0812-2345-6789")
+  email           String  @default("pkm.cimanggung@sumedangkab.go.id")
+  headOfClinic    String  @default("dr. Hj. Heti Supriati, M.K.M.")
+  mapsUrl         String  @default("https://maps.google.com/?q=Puskesmas+Cimanggung+Sumedang")
+  statusOverride  String  @default("AUTO") // AUTO, FORCE_OPEN, FORCE_CLOSED
+}
