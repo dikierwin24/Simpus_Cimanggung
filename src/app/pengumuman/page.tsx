@@ -2,15 +2,22 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANNOUNCEMENTS } from "@/lib/mockData";
 import Link from "next/link";
 import { FileText, Calendar, User, ArrowRight, Tag } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function PengumumanPage() {
-  const announcements = await prisma.announcement.findMany({
-    orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
-  });
+  let announcements: any[] = FALLBACK_ANNOUNCEMENTS;
+  try {
+    const dbAnnouncements = await prisma.announcement.findMany({
+      orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
+    });
+    if (dbAnnouncements && dbAnnouncements.length > 0) announcements = dbAnnouncements;
+  } catch (err) {
+    console.warn("[PengumumanPage] Database unavailable, using fallback mock data:", err);
+  }
 
   return (
     <>
@@ -59,16 +66,17 @@ export default async function PengumumanPage() {
                   </p>
                 </div>
 
-                <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium truncate max-w-[150px]">
-                    {item.author}
+                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1">
+                    <User className="w-3.5 h-3.5 text-medical-500" />
+                    <span>{item.author}</span>
                   </span>
                   <Link
                     href={`/pengumuman/${item.slug}`}
-                    className="font-bold text-medical-600 hover:text-medical-700 inline-flex items-center gap-1 group"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-medical-700 hover:text-medical-800"
                   >
-                    <span>Selengkapnya</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+                    <span>Baca Selengkapnya</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </article>

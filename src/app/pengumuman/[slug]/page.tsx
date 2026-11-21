@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_ANNOUNCEMENTS } from "@/lib/mockData";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, User, ArrowLeft, Share2, Tag, ShieldCheck } from "lucide-react";
@@ -13,9 +14,19 @@ export default async function PengumumanDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const item = await prisma.announcement.findUnique({
-    where: { slug: params.slug },
-  });
+  let item: any = null;
+
+  try {
+    item = await prisma.announcement.findUnique({
+      where: { slug: params.slug },
+    });
+  } catch (err) {
+    console.warn("[PengumumanDetailPage] Database unavailable, looking up fallback data:", err);
+  }
+
+  if (!item) {
+    item = FALLBACK_ANNOUNCEMENTS.find((a) => a.slug === params.slug);
+  }
 
   if (!item) {
     notFound();

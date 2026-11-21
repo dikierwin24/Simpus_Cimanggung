@@ -6,6 +6,11 @@ import StatusBadge from "@/components/StatusBadge";
 import { PKM_INFO } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import {
+  FALLBACK_ANNOUNCEMENTS,
+  FALLBACK_POLIS,
+  FALLBACK_DOCTORS,
+} from "@/lib/mockData";
+import {
   Activity,
   ArrowRight,
   Calendar,
@@ -29,21 +34,35 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Fetch real-time data dari database
-  const [announcements, poliList, totalDoctors, todayQueuesCount] = await Promise.all([
-    prisma.announcement.findMany({
-      take: 3,
-      orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
-    }),
-    prisma.poli.findMany({
-      where: { isActive: true },
-      include: {
-        doctors: { where: { isActive: true } },
-      },
-    }),
-    prisma.doctor.count({ where: { isActive: true } }),
-    prisma.queueTicket.count(),
-  ]);
+  // Fetch real-time data dari database dengan graceful fallback
+  let announcements: any[] = FALLBACK_ANNOUNCEMENTS.slice(0, 3);
+  let poliList: any[] = FALLBACK_POLIS;
+  let totalDoctors = FALLBACK_DOCTORS.length;
+  let todayQueuesCount = 42;
+
+  try {
+    const [dbAnnouncements, dbPoliList, dbTotalDoctors, dbTodayQueues] = await Promise.all([
+      prisma.announcement.findMany({
+        take: 3,
+        orderBy: [{ isPinned: "desc" }, { publishedAt: "desc" }],
+      }),
+      prisma.poli.findMany({
+        where: { isActive: true },
+        include: {
+          doctors: { where: { isActive: true } },
+        },
+      }),
+      prisma.doctor.count({ where: { isActive: true } }),
+      prisma.queueTicket.count(),
+    ]);
+
+    if (dbAnnouncements && dbAnnouncements.length > 0) announcements = dbAnnouncements;
+    if (dbPoliList && dbPoliList.length > 0) poliList = dbPoliList;
+    if (typeof dbTotalDoctors === "number" && dbTotalDoctors > 0) totalDoctors = dbTotalDoctors;
+    if (typeof dbTodayQueues === "number") todayQueuesCount = dbTodayQueues;
+  } catch (err) {
+    console.warn("[HomePage] Database unavailable, using fallback mock data:", err);
+  }
 
   return (
     <>

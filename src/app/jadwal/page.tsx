@@ -2,24 +2,35 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_SCHEDULES, FALLBACK_POLIS } from "@/lib/mockData";
 import JadwalClientView from "./JadwalClientView";
 
 export const dynamic = "force-dynamic";
 
 export default async function JadwalPage() {
-  const [schedules, polis] = await Promise.all([
-    prisma.schedule.findMany({
-      include: {
-        doctor: true,
-        poli: true,
-      },
-      orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
-    }),
-    prisma.poli.findMany({
-      where: { isActive: true },
-      orderBy: { name: "asc" },
-    }),
-  ]);
+  let schedules: any[] = FALLBACK_SCHEDULES;
+  let polis: any[] = FALLBACK_POLIS;
+
+  try {
+    const [dbSchedules, dbPolis] = await Promise.all([
+      prisma.schedule.findMany({
+        include: {
+          doctor: true,
+          poli: true,
+        },
+        orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+      }),
+      prisma.poli.findMany({
+        where: { isActive: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
+
+    if (dbSchedules && dbSchedules.length > 0) schedules = dbSchedules;
+    if (dbPolis && dbPolis.length > 0) polis = dbPolis;
+  } catch (err) {
+    console.warn("[JadwalPage] Database unavailable, using fallback mock data:", err);
+  }
 
   return (
     <>

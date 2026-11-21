@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { FALLBACK_POLIS } from "@/lib/mockData";
 import AntreanClientView from "./AntreanClientView";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,16 @@ export default async function AntreanPage({
 }) {
   const defaultPoliId = typeof searchParams.poli === "string" ? searchParams.poli : undefined;
 
-  const polis = await prisma.poli.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+  let polis: any[] = FALLBACK_POLIS;
+  try {
+    const dbPolis = await prisma.poli.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+    });
+    if (dbPolis && dbPolis.length > 0) polis = dbPolis;
+  } catch (err) {
+    console.warn("[AntreanPage] Database unavailable, using fallback mock data:", err);
+  }
 
   return (
     <>

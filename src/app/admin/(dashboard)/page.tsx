@@ -21,33 +21,52 @@ export default async function AdminDashboardOverview() {
   const todayStr = getTodayDateString();
   const dayOfWeek = new Date().getDay() === 0 ? 7 : new Date().getDay();
 
-  // Ambil data agregat
-  const [
-    totalTodayQueues,
-    waitingQueues,
-    calledQueues,
-    doneQueues,
-    todaySchedules,
-    recentQueues,
-    totalAnnouncements,
-  ] = await Promise.all([
-    prisma.queueTicket.count({ where: { appointmentDate: todayStr } }),
-    prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "MENUNGGU" } }),
-    prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "DIPANGGIL" } }),
-    prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "SELESAI" } }),
-    prisma.schedule.findMany({
-      where: { dayOfWeek },
-      include: { doctor: true, poli: true },
-      orderBy: { startTime: "asc" },
-    }),
-    prisma.queueTicket.findMany({
-      where: { appointmentDate: todayStr },
-      include: { poli: true },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    }),
-    prisma.announcement.count(),
-  ]);
+  let totalTodayQueues = 0;
+  let waitingQueues = 0;
+  let calledQueues = 0;
+  let doneQueues = 0;
+  let todaySchedules: any[] = [];
+  let recentQueues: any[] = [];
+  let totalAnnouncements = 0;
+
+  try {
+    const [
+      dbTotalTodayQueues,
+      dbWaitingQueues,
+      dbCalledQueues,
+      dbDoneQueues,
+      dbTodaySchedules,
+      dbRecentQueues,
+      dbTotalAnnouncements,
+    ] = await Promise.all([
+      prisma.queueTicket.count({ where: { appointmentDate: todayStr } }),
+      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "MENUNGGU" } }),
+      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "DIPANGGIL" } }),
+      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "SELESAI" } }),
+      prisma.schedule.findMany({
+        where: { dayOfWeek },
+        include: { doctor: true, poli: true },
+        orderBy: { startTime: "asc" },
+      }),
+      prisma.queueTicket.findMany({
+        where: { appointmentDate: todayStr },
+        include: { poli: true },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }),
+      prisma.announcement.count(),
+    ]);
+
+    totalTodayQueues = dbTotalTodayQueues;
+    waitingQueues = dbWaitingQueues;
+    calledQueues = dbCalledQueues;
+    doneQueues = dbDoneQueues;
+    todaySchedules = dbTodaySchedules;
+    recentQueues = dbRecentQueues;
+    totalAnnouncements = dbTotalAnnouncements;
+  } catch (err) {
+    console.warn("[AdminDashboardOverview] Database error, using default counts:", err);
+  }
 
   return (
     <div className="space-y-8">
