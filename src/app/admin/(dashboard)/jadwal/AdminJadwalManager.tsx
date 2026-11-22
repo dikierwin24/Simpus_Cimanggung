@@ -145,7 +145,7 @@ export default function AdminJadwalManager({
       const json = await res.json();
       if (json.success) {
         setSchedules((prev) =>
-          prev.map((s) => (s.id === editingSchedule.id ? json.data : s))
+          prev.map((s) => (s.id === editingSchedule.id ? { ...s, ...json.data } : s))
         );
         setEditingSchedule(null);
       } else {
@@ -242,7 +242,12 @@ export default function AdminJadwalManager({
       });
       const json = await res.json();
       if (json.success) {
-        setSchedules((prev) => [...prev, json.data]);
+        const fullNewSchedule = {
+          ...json.data,
+          doctor: json.data?.doctor || (doctorObj ? { id: doctorObj.id, name: doctorObj.name, specialization: doctorObj.specialization } : { id: "unknown", name: "Dokter", specialization: "Umum" }),
+          poli: json.data?.poli || (doctorObj?.poli ? { id: doctorObj.poli.id, name: doctorObj.poli.name, roomNumber: "Ruang Poli" } : { id: "poli", name: "Poli", roomNumber: "R.01" }),
+        };
+        setSchedules((prev) => [...prev, fullNewSchedule]);
         setShowScheduleModal(false);
         alert("Jadwal praktik berhasil ditambahkan!");
       } else {
