@@ -2,9 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 
-// On Vercel / AWS Lambda serverless environments, the deployment directory (/var/task) is read-only.
-// SQLite requires write access to create locks / journal files, so we replicate the db to /tmp.
-if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+// Only replicate SQLite if DATABASE_URL starts with "file:" or is not set.
+// If connecting to PostgreSQL (Supabase / Neon), we DO NOT touch process.env.DATABASE_URL!
+if (
+  (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) &&
+  (!process.env.DATABASE_URL || process.env.DATABASE_URL.startsWith("file:"))
+) {
   try {
     const tmpDbPath = path.join("/tmp", "dev.db");
     if (!fs.existsSync(tmpDbPath)) {

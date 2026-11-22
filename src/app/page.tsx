@@ -10,6 +10,7 @@ import {
   FALLBACK_POLIS,
   FALLBACK_DOCTORS,
 } from "@/lib/mockData";
+import { seedDatabase } from "@/lib/seedDatabase";
 import {
   Activity,
   ArrowRight,
@@ -57,7 +58,12 @@ export default async function HomePage() {
     ]);
 
     if (dbAnnouncements && dbAnnouncements.length > 0) announcements = dbAnnouncements;
-    if (dbPoliList && dbPoliList.length > 0) poliList = dbPoliList;
+    if (dbPoliList && dbPoliList.length > 0) {
+      poliList = dbPoliList;
+    } else if (dbPoliList && dbPoliList.length === 0) {
+      // Jika database terhubung tapi masih kosong, jalankan auto-seed
+      seedDatabase().catch((e) => console.warn("Auto-seed error:", e));
+    }
     if (typeof dbTotalDoctors === "number" && dbTotalDoctors > 0) totalDoctors = dbTotalDoctors;
     if (typeof dbTodayQueues === "number") todayQueuesCount = dbTodayQueues;
   } catch (err) {
