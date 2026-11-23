@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getTodayDateString } from "@/lib/utils";
 import {
-  Users,
   Calendar,
   Clock,
   CheckCircle2,
@@ -12,61 +11,49 @@ import {
   ArrowRight,
   Stethoscope,
   Activity,
-  UserCheck,
+  Users,
+  Shield,
+  Layers,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardOverview() {
-  const todayStr = getTodayDateString();
   const dayOfWeek = new Date().getDay() === 0 ? 7 : new Date().getDay();
 
-  let totalTodayQueues = 0;
-  let waitingQueues = 0;
-  let calledQueues = 0;
-  let doneQueues = 0;
   let todaySchedules: any[] = [];
-  let recentQueues: any[] = [];
+  let totalDoctors = 0;
+  let totalPolis = 0;
   let totalAnnouncements = 0;
 
   try {
     const [
-      dbTotalTodayQueues,
-      dbWaitingQueues,
-      dbCalledQueues,
-      dbDoneQueues,
       dbTodaySchedules,
-      dbRecentQueues,
+      dbTotalDoctors,
+      dbTotalPolis,
       dbTotalAnnouncements,
     ] = await Promise.all([
-      prisma.queueTicket.count({ where: { appointmentDate: todayStr } }),
-      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "MENUNGGU" } }),
-      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "DIPANGGIL" } }),
-      prisma.queueTicket.count({ where: { appointmentDate: todayStr, status: "SELESAI" } }),
       prisma.schedule.findMany({
         where: { dayOfWeek },
         include: { doctor: true, poli: true },
         orderBy: { startTime: "asc" },
       }),
-      prisma.queueTicket.findMany({
-        where: { appointmentDate: todayStr },
-        include: { poli: true },
-        orderBy: { createdAt: "desc" },
-        take: 6,
-      }),
+      prisma.doctor.count({ where: { isActive: true } }),
+      prisma.poli.count({ where: { isActive: true } }),
       prisma.announcement.count(),
     ]);
 
-    totalTodayQueues = dbTotalTodayQueues;
-    waitingQueues = dbWaitingQueues;
-    calledQueues = dbCalledQueues;
-    doneQueues = dbDoneQueues;
     todaySchedules = dbTodaySchedules;
-    recentQueues = dbRecentQueues;
+    totalDoctors = dbTotalDoctors;
+    totalPolis = dbTotalPolis;
     totalAnnouncements = dbTotalAnnouncements;
   } catch (err) {
-    console.warn("[AdminDashboardOverview] Database error, using default counts:", err);
+    console.warn("[AdminDashboardOverview] Database error:", err);
   }
+
+  const doctorsHadir = todaySchedules.filter((s) => s.status === "HADIR").length;
+  const doctorsCuti = todaySchedules.filter((s) => s.status === "CUTI").length;
+  const doctorsTugasLuar = todaySchedules.filter((s) => s.status === "TUGAS_LUAR").length;
 
   return (
     <div className="space-y-8">
@@ -77,24 +64,24 @@ export default async function AdminDashboardOverview() {
             Ringkasan Operasional Hari Ini
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Pantau dan kelola kehadiran nakes, antrean warga, dan pengumuman Puskesmas Cimanggung.
+            Kelola kehadiran dokter, jam pelayanan poli, dan publikasi pengumuman Puskesmas Cimanggung.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <Link
-            href="/admin/antrean"
+            href="/admin/jadwal"
             className="inline-flex items-center gap-2 bg-medical-600 hover:bg-medical-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-sm transition"
           >
-            <UserCheck className="w-4 h-4" />
-            <span>Kelola Loket & Antrean</span>
+            <Calendar className="w-4 h-4" />
+            <span>Kelola Jadwal Dokter</span>
           </Link>
           <Link
-            href="/admin/jadwal"
+            href="/admin/pengumuman"
             className="inline-flex items-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs transition"
           >
-            <Calendar className="w-4 h-4 text-medical-600" />
-            <span>Update Jadwal Dokter</span>
+            <Bell className="w-4 h-4 text-medical-600" />
+            <span>Tambah Pengumuman</span>
           </Link>
         </div>
       </div>
@@ -103,50 +90,50 @@ export default async function AdminDashboardOverview() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-soft">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase">Antrean Hari Ini</span>
+            <span className="text-xs font-bold text-slate-500 uppercase">Jadwal Hari Ini</span>
             <div className="w-9 h-9 rounded-xl bg-medical-50 text-medical-600 flex items-center justify-center">
-              <Users className="w-5 h-5" />
+              <Calendar className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{totalTodayQueues}</span>
-            <span className="text-xs text-slate-500">Pasien Terdaftar</span>
+            <span className="text-3xl font-black text-slate-900">{todaySchedules.length}</span>
+            <span className="text-xs text-slate-500">Sesi Praktik</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-            <span className="text-amber-600 font-semibold">{waitingQueues} Menunggu</span>
-            <span className="text-emerald-600 font-semibold">{doneQueues} Selesai</span>
+            <span className="text-emerald-600 font-semibold">{doctorsHadir} Hadir</span>
+            <span className="text-rose-600 font-semibold">{doctorsCuti} Cuti</span>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-soft">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase">Sedang Dipanggil</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Activity className="w-5 h-5 animate-pulse" />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-amber-600">{calledQueues}</span>
-            <span className="text-xs text-slate-500">Dalam Pemeriksaan</span>
-          </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-            Diperbarui secara live dari loket poli
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-soft">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase">Dokter Hari Ini</span>
+            <span className="text-xs font-bold text-slate-500 uppercase">Dokter Hadir Siaga</span>
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Stethoscope className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900">{todaySchedules.length}</span>
-            <span className="text-xs text-slate-500">Jadwal Praktik</span>
+            <span className="text-3xl font-black text-emerald-600">{doctorsHadir}</span>
+            <span className="text-xs text-slate-500">Tenaga Medis</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-emerald-700 font-semibold">
-            {todaySchedules.filter((s) => s.status === "HADIR").length} Dokter Hadir Siaga
+          <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+            {doctorsTugasLuar > 0 ? `${doctorsTugasLuar} Dokter Tugas Luar/Posyandu` : "Semua dokter siap di poli"}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-soft">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase">Unit Layanan & Poli</span>
+            <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+              <Layers className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-black text-slate-900">{totalPolis}</span>
+            <span className="text-xs text-slate-500">Poli Aktif</span>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-teal-700 font-semibold">
+            Rawat Jalan, UGD & PONED 24 Jam
           </div>
         </div>
 
@@ -159,112 +146,138 @@ export default async function AdminDashboardOverview() {
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-black text-slate-900">{totalAnnouncements}</span>
-            <span className="text-xs text-slate-500">Postingan Warga</span>
+            <span className="text-xs text-slate-500">Informasi Publik</span>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-500">
-            CKG, Posyandu, dan info vaksin
+            CKG, Posyandu, dan info imunisasi
           </div>
         </div>
       </div>
 
-      {/* Grid: 2 Columns (Antrean Terbaru vs Dokter Hari Ini) */}
+      {/* Grid: 2 Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Antrean Terbaru */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 shadow-soft p-6">
+        {/* Jadwal Dokter Hari Ini */}
+        <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 shadow-soft p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Pendaftaran Antrean Terbaru Hari Ini</h2>
-              <p className="text-xs text-slate-500">Daftar pasien yang mendaftar online hari ini</p>
+              <h2 className="text-base font-bold text-slate-900">Jadwal Praktik Dokter & Tenaga Medis Hari Ini</h2>
+              <p className="text-xs text-slate-500">Pantau dan ubah status kehadiran dokter secara langsung</p>
             </div>
             <Link
-              href="/admin/antrean"
+              href="/admin/jadwal"
               className="text-xs font-bold text-medical-600 hover:text-medical-700 flex items-center gap-1"
             >
-              <span>Lihat Semua</span>
+              <span>Kelola Jadwal</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {recentQueues.length > 0 ? (
+          {todaySchedules.length > 0 ? (
             <div className="divide-y divide-slate-100 text-xs">
-              {recentQueues.map((q) => (
-                <div key={q.id} className="py-3 flex items-center justify-between gap-4">
+              {todaySchedules.map((s) => (
+                <div key={s.id} className="py-3 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono font-black text-sm text-medical-600 bg-medical-50 px-2.5 py-1 rounded-lg border border-medical-200">
-                      {q.ticketNumber}
-                    </span>
+                    <div className="w-8 h-8 rounded-lg bg-medical-50 text-medical-700 flex items-center justify-center font-bold text-xs shrink-0">
+                      <Stethoscope className="w-4 h-4" />
+                    </div>
                     <div>
-                      <h4 className="font-bold text-slate-900">{q.patientName}</h4>
+                      <h4 className="font-bold text-slate-900">{s.doctor.name}</h4>
                       <p className="text-slate-500 text-[11px]">
-                        {q.poli.name} • {q.patientType}
+                        {s.poli.name} • {s.startTime} - {s.endTime} WIB
                       </p>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2.5 py-0.5 rounded-full font-bold text-[11px] ${
-                      q.status === "DIPANGGIL"
-                        ? "bg-amber-100 text-amber-800 animate-pulse"
-                        : q.status === "SELESAI"
-                        ? "bg-slate-100 text-slate-600"
-                        : "bg-emerald-50 text-emerald-700"
+                    className={`px-2.5 py-1 rounded-full font-bold text-[11px] ${
+                      s.status === "HADIR"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : s.status === "CUTI"
+                        ? "bg-rose-100 text-rose-800"
+                        : s.status === "TUGAS_LUAR"
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-blue-100 text-blue-800"
                     }`}
                   >
-                    {q.status}
+                    {s.status}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-8 text-slate-400 text-xs">
-              Belum ada antrean yang terdaftar hari ini.
+              Tidak ada jadwal dokter untuk hari ini atau seluruh poli rawat jalan sedang tutup.
             </div>
           )}
         </div>
 
-        {/* Dokter Bertugas Hari Ini */}
-        <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-soft p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">Dokter Praktik Hari Ini</h2>
-              <p className="text-xs text-slate-500">Status kehadiran saat ini</p>
+        {/* Pintasan Pengelolaan */}
+        <div className="lg:col-span-4 space-y-5">
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-soft p-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Pintasan Manajemen Cepat</h3>
+            <div className="space-y-2">
+              <Link
+                href="/admin/jadwal"
+                className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-medical-300 hover:bg-medical-50/50 transition group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Calendar className="w-4 h-4 text-medical-600" />
+                  <span className="text-xs font-semibold text-slate-800 group-hover:text-medical-700">
+                    Update Status & Jadwal Dokter
+                  </span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition" />
+              </Link>
+
+              <Link
+                href="/admin/jam-layanan"
+                className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-medical-300 hover:bg-medical-50/50 transition group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Clock className="w-4 h-4 text-medical-600" />
+                  <span className="text-xs font-semibold text-slate-800 group-hover:text-medical-700">
+                    Atur Jam Loket & Pelayanan
+                  </span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition" />
+              </Link>
+
+              <Link
+                href="/admin/pengumuman"
+                className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-medical-300 hover:bg-medical-50/50 transition group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Bell className="w-4 h-4 text-medical-600" />
+                  <span className="text-xs font-semibold text-slate-800 group-hover:text-medical-700">
+                    Tulis Pengumuman & Berita
+                  </span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition" />
+              </Link>
+
+              <Link
+                href="/admin/informasi"
+                className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-medical-300 hover:bg-medical-50/50 transition group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Shield className="w-4 h-4 text-medical-600" />
+                  <span className="text-xs font-semibold text-slate-800 group-hover:text-medical-700">
+                    Ubah Profil & Kontak Puskesmas
+                  </span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition" />
+              </Link>
             </div>
-            <Link
-              href="/admin/jadwal"
-              className="text-xs font-bold text-medical-600 hover:text-medical-700 flex items-center gap-1"
-            >
-              <span>Ubah Status</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
           </div>
 
-          <div className="space-y-3">
-            {todaySchedules.map((s) => (
-              <div
-                key={s.id}
-                className="p-3 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between gap-3 text-xs"
-              >
-                <div>
-                  <h4 className="font-bold text-slate-900">{s.doctor.name}</h4>
-                  <p className="text-slate-500 text-[11px]">
-                    {s.poli.name} • {s.startTime} - {s.endTime} WIB
-                  </p>
-                </div>
-                <span
-                  className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                    s.status === "HADIR"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : s.status === "CUTI"
-                      ? "bg-rose-100 text-rose-800"
-                      : s.status === "TUGAS_LUAR"
-                      ? "bg-amber-100 text-amber-800"
-                      : "bg-blue-100 text-blue-800"
-                  }`}
-                >
-                  {s.status}
-                </span>
-              </div>
-            ))}
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 rounded-2xl p-5 text-emerald-950">
+            <div className="flex items-center gap-2 font-bold text-xs text-emerald-800 mb-1">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>Database Online Aktif</span>
+            </div>
+            <p className="text-[11px] text-emerald-800/80 leading-relaxed">
+              Semua perubahan status dokter dan informasi yang Anda ubah di panel ini tersimpan langsung di server cloud PostgreSQL Supabase.
+            </p>
           </div>
         </div>
       </div>

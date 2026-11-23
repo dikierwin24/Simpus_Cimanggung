@@ -102,7 +102,7 @@ export default function AlurLayananPage() {
             <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <p>
-                <strong>Catatan Penting:</strong> Pasien yang telah mengambil nomor antrean online melalui website diharapkan tiba di loket verifikasi paling lambat 15 menit sebelum loket ditutup agar rekam medis dapat disiapkan tepat waktu.
+                <strong>Catatan Penting:</strong> Pasien diharapkan hadir di loket pendaftaran tepat waktu sesuai jam operasional (paling lambat 30 menit sebelum loket tutup) agar berkas rekam medis dapat diproses dengan baik.
               </p>
             </div>
           </section>
@@ -124,7 +124,7 @@ export default function AlurLayananPage() {
                 {
                   step: "1",
                   title: "Pendaftaran / Loket",
-                  desc: "Ambil nomor antrean (atau bawa tiket online), serahkan KTP/BPJS ke petugas loket untuk pencarian berkas rekam medis.",
+                  desc: "Ambil nomor antrean di mesin loket, serahkan KTP/BPJS ke petugas loket untuk verifikasi dan pencarian rekam medis.",
                   color: "border-sky-300 bg-sky-50/50",
                   tag: "Loket 1 & 2",
                 },
@@ -272,16 +272,16 @@ export default function AlurLayananPage() {
           {/* Quick Bottom CTA */}
           <div className="bg-gradient-to-r from-medical-700 via-medical-600 to-emerald-600 rounded-2xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl font-bold">Sudah Tahu Alur dan Syaratnya?</h3>
+              <h3 className="text-xl font-bold">Ingin Tahu Dokter yang Bertugas Hari Ini?</h3>
               <p className="text-xs text-white/90 mt-1 max-w-xl">
-                Ambil nomor antrean online dari rumah sekarang agar tidak perlu mengantre berdiri lama di loket pendaftaran.
+                Cek jadwal praktik dokter dan tenaga medis yang sedang bertugas di setiap poli rawat jalan Puskesmas Cimanggung.
               </p>
             </div>
             <Link
-              href="/antrean"
+              href="/jadwal"
               className="inline-flex items-center gap-2 bg-white text-medical-700 hover:bg-medical-50 font-bold px-6 py-3 rounded-xl shadow-md transition text-xs sm:text-sm whitespace-nowrap"
             >
-              <span>Daftar Antrean Online</span>
+              <span>Lihat Jadwal Dokter</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

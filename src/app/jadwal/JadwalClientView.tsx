@@ -329,10 +329,10 @@ export default function JadwalClientView({ initialSchedules, polis }: Props) {
               <div className="mt-5 pt-1">
                 {item.status === "HADIR" || item.status === "DIGANTIKAN" ? (
                   <Link
-                    href={`/antrean?poli=${item.poli.id}`}
+                    href="/alur-layanan"
                     className="w-full inline-flex items-center justify-center gap-2 bg-medical-600 hover:bg-medical-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow-sm transition"
                   >
-                    <span>Daftar Antrean {item.poli.name}</span>
+                    <span>Alur & Jam Pelayanan</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 ) : (

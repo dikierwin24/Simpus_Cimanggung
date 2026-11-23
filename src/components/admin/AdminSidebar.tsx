@@ -23,7 +23,6 @@ export default function AdminSidebar() {
   const links = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/jadwal", label: "Kelola Jadwal Dokter", icon: Calendar },
-    { href: "/admin/antrean", label: "Antrean Hari Ini", icon: Users },
     { href: "/admin/pengumuman", label: "Pengumuman & Edukasi", icon: Bell },
     { href: "/admin/jam-layanan", label: "Jam Operasional", icon: Clock },
     { href: "/admin/informasi", label: "Informasi & Kontak", icon: Shield },

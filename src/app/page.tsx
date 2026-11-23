@@ -105,25 +105,25 @@ export default async function HomePage() {
                 </h1>
 
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-                  Selamat datang di portal resmi <strong>{PKM_INFO.name}</strong>. Akses jadwal praktik dokter secara real-time, daftar antrean poli dari rumah, serta informasi layanan kesehatan dan UGD 24 jam.
+                  Selamat datang di portal resmi <strong>{PKM_INFO.name}</strong>. Akses jadwal praktik dokter secara real-time, panduan alur dan jam operasional puskesmas, serta informasi layanan kesehatan dan UGD 24 jam.
                 </p>
 
                 {/* Primary Action Buttons */}
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <Link
-                    href="/antrean"
+                    href="/jadwal"
                     className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-medical-600 to-teal-600 hover:from-medical-700 hover:to-teal-700 text-white font-bold px-6 py-3.5 rounded-2xl shadow-glow hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base"
                   >
-                    <span>Ambil Nomor Antrean</span>
+                    <span>Jadwal Dokter & Poli</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
 
                   <Link
-                    href="/jadwal"
+                    href="/alur-layanan"
                     className="inline-flex items-center justify-center gap-2 bg-white/90 hover:bg-white text-slate-800 font-bold px-5 py-3.5 rounded-2xl border border-medical-200 shadow-soft hover:border-medical-400 hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base"
                   >
-                    <Calendar className="w-4 h-4 text-medical-600" />
-                    <span>Jadwal Dokter & Poli</span>
+                    <Clock className="w-4 h-4 text-medical-600" />
+                    <span>Alur & Jam Kerja</span>
                   </Link>
 
                   <a
@@ -316,10 +316,10 @@ export default async function HomePage() {
                       Kuota: <strong className="text-slate-700">{poli.quotaPerDay} Pasien/Hari</strong>
                     </span>
                     <Link
-                      href={`/antrean?poli=${poli.id}`}
+                      href="/jadwal"
                       className="font-bold text-medical-600 hover:text-medical-700 inline-flex items-center gap-1 group-hover:translate-x-0.5 transition"
                     >
-                      <span>Daftar</span>
+                      <span>Lihat Jadwal</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -348,13 +348,13 @@ export default async function HomePage() {
               {[
                 {
                   step: "01",
-                  title: "Ambil Antrean Online",
-                  desc: "Daftar lewat website ini dari rumah untuk mendapatkan nomor tiket digital dan estimasi kedatangan.",
+                  title: "Ambil Tiket di Loket",
+                  desc: "Datang langsung ke loket pendaftaran Puskesmas Cimanggung dan ambil nomor antrean loket sesuai keperluan poli.",
                 },
                 {
                   step: "02",
-                  title: "Verifikasi di Loket",
-                  desc: "Tunjukkan nomor antrean digital kepada petugas loket bersama KTP/KK dan Kartu BPJS (jika ada).",
+                  title: "Pendaftaran & Berkas",
+                  desc: "Serahkan KTP/KK dan Kartu BPJS Kesehatan aktif (jika ada) ke petugas loket untuk pencarian berkas rekam medis.",
                 },
                 {
                   step: "03",
@@ -471,14 +471,14 @@ export default async function HomePage() {
               Kesehatan Anda dan Keluarga Adalah Prioritas Kami
             </h2>
             <p className="text-sm sm:text-base text-medical-100 max-w-2xl mx-auto leading-relaxed">
-              Jangan tunda pemeriksaan kesehatan. Segera kunjungi Puskesmas Cimanggung atau ambil nomor antrean sekarang untuk menghindari antrean panjang di loket.
+              Jangan tunda pemeriksaan kesehatan. Segera kunjungi Puskesmas Cimanggung pada jam kerja pelayanan atau hubungi nomor darurat UGD 24 Jam kami jika butuh penanganan segera.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <Link
-                href="/antrean"
+                href="/jadwal"
                 className="bg-white text-medical-800 hover:bg-medical-50 font-bold px-6 py-3.5 rounded-2xl shadow-elevated hover:-translate-y-0.5 transition text-sm"
               >
-                Ambil Antrean Online Sekarang
+                Lihat Jadwal Praktik Dokter
               </Link>
               <Link
                 href="/kontak"

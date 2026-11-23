@@ -91,10 +91,10 @@ export default async function PengumumanDetailPage({
                 Diterbitkan secara resmi oleh UPTD Puskesmas Cimanggung, Kab. Sumedang
               </div>
               <Link
-                href="/antrean"
+                href="/jadwal"
                 className="inline-flex items-center gap-2 bg-medical-600 hover:bg-medical-700 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-sm transition"
               >
-                <span>Daftar Antrean Terkait</span>
+                <span>Lihat Jadwal Dokter</span>
               </Link>
             </div>
           </article>

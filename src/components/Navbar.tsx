@@ -27,7 +27,6 @@ export default function Navbar() {
     { href: "/", label: "Beranda", icon: Activity },
     { href: "/jadwal", label: "Jadwal Dokter", icon: Calendar },
     { href: "/alur-layanan", label: "Alur & Jam Kerja", icon: Clock },
-    { href: "/antrean", label: "Antrean Online", icon: UserCheck },
     { href: "/pengumuman", label: "Pengumuman", icon: FileText },
     { href: "/kontak", label: "Kontak & Lokasi", icon: PhoneCall },
   ];
@@ -112,10 +111,10 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <StatusBadge />
             <Link
-              href="/antrean"
+              href="/jadwal"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-medical-600 to-medical-500 hover:from-medical-700 hover:to-medical-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl shadow-md shadow-medical-500/20 hover:shadow-lg transition-all duration-200"
             >
-              <span>Daftar Antrean</span>
+              <span>Jadwal Dokter</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -164,11 +163,11 @@ export default function Navbar() {
 
           <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
             <Link
-              href="/antrean"
+              href="/jadwal"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center bg-medical-600 text-white font-bold py-3 rounded-xl shadow-md text-sm"
             >
-              Ambil Nomor Antrean Online
+              Lihat Jadwal Dokter & Tenaga Medis
             </Link>
             <Link
               href="/admin/login"
