@@ -4,12 +4,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Puskesmas Cimanggung - Kabupaten Sumedang",
   description:
-    "Sistem Informasi Resmi UPTD Puskesmas Cimanggung, Dinas Kesehatan Kabupaten Sumedang. Jadwal dokter, antrean online, jam pelayanan, dan layanan UGD 24 Jam.",
+    "Sistem Informasi Resmi UPTD Puskesmas Cimanggung, Dinas Kesehatan Kabupaten Sumedang. Jadwal dokter, alur pelayanan, dan layanan UGD 24 Jam.",
   keywords: [
     "Puskesmas Cimanggung",
     "Sumedang",
     "Jadwal Dokter Puskesmas",
-    "Antrean Online Puskesmas",
+    "Jadwal Pelayanan Puskesmas",
     "Dinas Kesehatan Sumedang",
     "UGD 24 Jam Cimanggung",
     "Poli Umum Cimanggung",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Puskesmas Cimanggung" }],
   openGraph: {
     title: "Puskesmas Cimanggung - Melayani Dengan Hati dan Senyuman",
-    description: "Sistem Informasi & Pendaftaran Antrean Online Puskesmas Cimanggung Kab. Sumedang",
+    description: "Sistem Informasi & Jadwal Praktik Puskesmas Cimanggung Kab. Sumedang",
     locale: "id_ID",
     type: "website",
   },
